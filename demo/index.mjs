@@ -7,18 +7,15 @@ const noteOn = midiUtil.statusMap.get('noteOn')
 const output = new midi.Output()
 output.openVirtualPort(defaultPortName)
 
-const c = [noteOn, 60, 127]
-const d = [noteOn, 70, 127]
-const e = [noteOn, 80, 127]
-const f = [noteOn, 90, 127]
+const c = [noteOn, midiUtil.ftom(880), 127]
+const f = [noteOn, midiUtil.ftom(220), 127]
 
-// prettier-ignore
 const data = [
   [
-    [c, c, c, c],
-    [d, e, e, d],
-    [e, e, e, e],
-    [f, f, e, d],
+    [c, f, f, f],
+    [f, f, f, f],
+    [f, f, f, f],
+    [f, f, f, f],
   ],
 ]
 
@@ -27,8 +24,9 @@ musicode({
   handlers: {
     tick(state) {
       if (is16thTick(state.tick)) {
-        const [bar, beat, sixteenth] = state.meter
-        const event = data[bar % data.length][beat][sixteenth]
+        const [b, q, s] = state.meter
+        const bar = data[b % data.length]
+        const event = bar[q % bar.length][s]
         output.sendMessage(event)
       }
     },

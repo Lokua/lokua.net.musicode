@@ -1,0 +1,21 @@
+{
+  "name": "@lokua/deep-ai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "NODE_OPTIONS=--no-warnings node src/index.mjs",
+    "test": "NODE_OPTIONS=--no-warnings node src/test-runner.mjs",
+    "lint": "./node_modules/.bin/prettier"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "6.1.0",
+    "eslint-config-lokua": "8.0.0",
+    "expect": "24.9.0",
+    "prettier": "1.19.1"
+  }
+}

@@ -1,6 +1,6 @@
 import { inspect } from 'util'
 
-export function test(name, fn) {
+export default function test(name, fn) {
   try {
     fn()
   } catch (error) {

@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
+    "start:watch": "chokidar \"**/*.mjs\" -c \"npm start -- --debug\"",
     "start": "NODE_OPTIONS=--no-warnings node demo/index.mjs",
     "test": "NODE_OPTIONS=--no-warnings node src/test-runner.mjs",
     "lint": "node_modules/.bin/prettier"
@@ -16,6 +17,7 @@
     "midi": "1.0.0"
   },
   "devDependencies": {
+    "chokidar-cli": "2.1.0",
     "eslint": "6.1.0",
     "eslint-config-lokua": "8.0.0",
     "prettier": "1.19.1"

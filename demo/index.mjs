@@ -28,6 +28,7 @@ musicode({
         const bar = data[b % data.length]
         const event = bar[q % bar.length][s]
         output.sendMessage(event)
+        // console.log(state.meter)
       }
     },
   },

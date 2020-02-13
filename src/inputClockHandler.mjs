@@ -1,10 +1,16 @@
 import midi from 'midi'
+// import midiUtil from '@lokua/midi-util'
+import { debug } from './util.mjs'
 
 inputClockHandler.input = new midi.Input()
-inputClockHandler.input.ignoreTypes(true, false, true)
+
+// sysex, timing, active sensing
+inputClockHandler.input.ignoreTypes(false, false, false)
 
 export default function inputClockHandler({ portName, handlers }) {
   inputClockHandler.input.on('message', (deltaTime, message) => {
+    // debug(midiUtil.statusMap.get(message[0]), ...message.slice(1))
+
     const handler = handlers.get(message[0])
 
     if (handler) {

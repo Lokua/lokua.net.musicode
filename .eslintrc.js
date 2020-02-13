@@ -5,5 +5,6 @@ module.exports = {
       1,
       { varsIgnorePattern: 'debug', ignoreRestSiblings: true },
     ],
+    'no-sparse-arrays': 0,
   },
 }

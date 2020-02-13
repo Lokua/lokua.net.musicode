@@ -3,7 +3,7 @@ module.exports = {
   rules: {
     'no-unused-vars': [
       1,
-      { varsIgnorePattern: 'log', ignoreRestSiblings: true },
+      { varsIgnorePattern: 'debug', ignoreRestSiblings: true },
     ],
   },
 }

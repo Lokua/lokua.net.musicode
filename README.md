@@ -44,3 +44,7 @@ every beat...
 ```
 e *.foo s 1
 ```
+
+---
+
+GOAL 1: turn `e *.*.* pc 0` into a midi output stream

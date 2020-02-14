@@ -50,7 +50,7 @@ export function getSongPositionTicks([, sixteenth, eighthBarCount]) {
 
 const defaultPortName = 'musicode'
 
-export default function musicode({ options, handlers }) {
+export default function musicode({ options = {}, handlers }) {
   const inputClockHandlers = new Map([
     [midiUtil.statusMap.get('start'), reset],
     [midiUtil.statusMap.get('stop'), reset],

@@ -7,7 +7,8 @@
     "start:watch": "chokidar \"**/*.mjs\" -c \"npm start -- --debug\"",
     "start": "NODE_OPTIONS=--no-warnings node demo/index.mjs",
     "test": "NODE_OPTIONS=--no-warnings node src/test-runner.mjs",
-    "lint": "node_modules/.bin/prettier"
+    "lint": "node_modules/.bin/prettier",
+    "peg": "pegjs -o src/grammer/grammer.js src/grammer/grammer.pegjs"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "chokidar-cli": "2.1.0",
     "eslint": "6.1.0",
     "eslint-config-lokua": "8.0.0",
+    "pegjs": "0.10.0",
     "prettier": "1.19.1"
   }
 }

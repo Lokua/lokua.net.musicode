@@ -15,19 +15,17 @@ console.info(music)
 
 musicode({
   handlers: {
-    tick(state) {
-      if (
-        is16thTick(state.tick) &&
-        canPlay({
-          meter: state.meter,
-          music,
+    tick({ meter, tick }) {
+      if (is16thTick(tick)) {
+        music.forEach(expression => {
+          if (canPlay({ meter, music: expression })) {
+            output.sendMessage([
+              noteOn,
+              scales[expression.scaleNumber][expression.scaleDegree],
+              127,
+            ])
+          }
         })
-      ) {
-        output.sendMessage([
-          noteOn,
-          scales[music.scaleNumber][music.scaleDegree],
-          127,
-        ])
       }
     },
   },

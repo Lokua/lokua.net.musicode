@@ -1,16 +1,13 @@
-import midi from 'midi'
-// import midiUtil from '@lokua/midi-util'
-import { debug } from './util.mjs'
-
-inputClockHandler.input = new midi.Input()
-
-// sysex, timing, active sensing
-inputClockHandler.input.ignoreTypes(false, false, false)
+import { fork } from 'child_process'
+import { debug, onExit } from './util.mjs'
+import projectRoot from './projectRoot.mjs'
 
 export default function inputClockHandler({ portName, handlers }) {
-  inputClockHandler.input.on('message', (deltaTime, message) => {
-    // debug(midiUtil.statusMap.get(message[0]), ...message.slice(1))
+  const child = fork(`${projectRoot}/src/inputWorker.mjs`, [portName], {
+    // detached: true,
+  })
 
+  child.on('message', ({ deltaTime, message }) => {
     const handler = handlers.get(message[0])
 
     if (handler) {
@@ -18,9 +15,7 @@ export default function inputClockHandler({ portName, handlers }) {
     }
   })
 
-  inputClockHandler.input.openVirtualPort(portName)
-
-  return function unsubscribe() {
-    inputClockHandler.input.closePort()
-  }
+  onExit(() => {
+    // child.disconnect()
+  })
 }

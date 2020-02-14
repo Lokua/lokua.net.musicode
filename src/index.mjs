@@ -3,7 +3,7 @@ import midiUtil from '@lokua/midi-util'
 import inputClockHandler from './inputClockHandler.mjs'
 import { partsPerQuarter } from './constants.mjs'
 import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
-import { onExit, safeCall } from './util.mjs'
+import { safeCall } from './util.mjs'
 
 global.DEBUG = !!process.argv.find(s => s.includes('debug'))
 
@@ -63,12 +63,10 @@ export default function musicode({ options = {}, handlers }) {
     ],
   ])
 
-  const portCleanup = inputClockHandler({
+  inputClockHandler({
     portName: options.port || defaultPortName,
     handlers: inputClockHandlers,
   })
-
-  onExit(portCleanup)
 }
 
 export { defaultPortName, isBarTick, isQuarterTick, is16thTick }

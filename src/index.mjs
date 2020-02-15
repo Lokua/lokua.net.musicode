@@ -6,6 +6,7 @@ import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
 import { onExit, safeCall } from './util.mjs'
 
 global.DEBUG = !!process.argv.find(s => s.includes('debug'))
+const m = midiUtil.statusMap.get.bind(midiUtil.statusMap)
 
 const state = {
   tick: -1,
@@ -48,15 +49,19 @@ export function getSongPositionTicks([, sixteenth, eighthBarCount]) {
   )
 }
 
-const defaultPortName = 'musicode'
+musicode.defaultPortName = 'musicode'
+musicode.getState = () => state
+musicode.isBarTick = isBarTick
+musicode.isQuarterTick = isQuarterTick
+musicode.is16thTick = is16thTick
 
-export default function musicode({ options = {}, handlers }) {
+export default function musicode({ handlers }) {
   const inputClockHandlers = new Map([
-    [midiUtil.statusMap.get('start'), reset],
-    [midiUtil.statusMap.get('stop'), reset],
-    [midiUtil.statusMap.get('clock'), updateCounts(handlers)],
+    [m('start'), reset],
+    [m('stop'), reset],
+    [m('clock'), updateCounts(handlers)],
     [
-      midiUtil.statusMap.get('songPosition'),
+      m('songPosition'),
       message => {
         updateCounts(getSongPositionTicks(message) - 1)
       },
@@ -64,11 +69,9 @@ export default function musicode({ options = {}, handlers }) {
   ])
 
   const portCleanup = inputClockHandler({
-    portName: options.port || defaultPortName,
+    portName: musicode.defaultPortName,
     handlers: inputClockHandlers,
   })
 
   onExit(portCleanup)
 }
-
-export { defaultPortName, isBarTick, isQuarterTick, is16thTick }

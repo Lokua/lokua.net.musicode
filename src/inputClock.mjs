@@ -10,7 +10,10 @@ export function subscribe({ portName, handlers }) {
     const handler = handlers.get(message[0])
 
     if (handler) {
-      handler(message, deltaTime)
+      handler({
+        message,
+        deltaTime,
+      })
     }
   })
 

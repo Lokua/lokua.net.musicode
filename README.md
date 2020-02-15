@@ -48,3 +48,13 @@ e *.foo s 1
 ---
 
 GOAL 1: turn `e *.*.* pc 0` into a midi output stream
+
+---
+
+IPC / dual process ideas:
+
+1. TCP
+2. UDP
+3. Electron multiple renderer processes
+4. Websockets
+5. Other IPC?

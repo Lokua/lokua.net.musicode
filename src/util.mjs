@@ -1,8 +1,13 @@
+import fs from 'fs'
 import { inspect } from 'util'
 
-export function debug(...args) {
+export function debug(data) {
   if (global.DEBUG) {
-    console.log(...args)
+    fs.appendFile(
+      'debug.log',
+      (typeof data === 'object' ? JSON.stringify(data) : data) + '\n',
+      console.error,
+    )
   }
 }
 

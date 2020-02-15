@@ -2,6 +2,7 @@ import EventEmitter from 'events'
 
 import { partsPerQuarter } from './constants.mjs'
 import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
+import { debug } from './util.mjs'
 
 const initialState = Object.freeze({
   clock: -1,
@@ -31,7 +32,9 @@ timeState.on('start', resetState)
 
 timeState.on('stop', resetState)
 
-timeState.on('clock', () => {
+timeState.on('clock', (...args) => {
+  debug({ timeStateOnClockArgs: args })
+
   const clock = state.clock++
   let [bar, beat, sixteenth] = state.meter
 

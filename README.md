@@ -8,9 +8,10 @@
 
 TODO:
 
-1. rename "tick" key of instruction "sixteenth"
-2. stream debug logs to file since they interfere with terminal input
-3. need history since rl doesn't restore on new sessions (?)
+- rename "tick" key of instruction "sixteenth"
+- stream debug logs to file since they interfere with terminal input
+- figure out how to use delta time and bpm to correct timing automatically
+- need history since rl doesn't restore on new sessions (?)
 
 ---
 

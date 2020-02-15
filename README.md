@@ -2,6 +2,8 @@
 
 (terrible name, placeholder for now)
 
+<img src="etc/musicode.svg">
+
 ## Thinking out loud
 
 The first basic idea for a procedural MIDI DSL: _"at TIME do X"_

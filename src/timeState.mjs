@@ -32,9 +32,7 @@ timeState.on('start', resetState)
 
 timeState.on('stop', resetState)
 
-timeState.on('clock', (...args) => {
-  debug({ timeStateOnClockArgs: args })
-
+timeState.on('clock', () => {
   const clock = state.clock++
   let [bar, beat, sixteenth] = state.meter
 

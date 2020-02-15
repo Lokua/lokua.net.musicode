@@ -3,10 +3,19 @@ import { inspect } from 'util'
 
 export function debug(data) {
   if (global.DEBUG) {
+    if (!debug.initialized) {
+      debug.initialized = true
+      fs.writeFileSync('debug.log', '')
+    }
+
     fs.appendFile(
       'debug.log',
       (typeof data === 'object' ? JSON.stringify(data) : data) + '\n',
-      console.error,
+      error => {
+        if (error) {
+          console.error(error)
+        }
+      },
     )
   }
 }

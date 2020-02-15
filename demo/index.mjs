@@ -23,6 +23,7 @@ musicode({
           music,
         })
       ) {
+        console.log('bang')
         output.sendMessage([
           noteOn,
           scales[music.scaleNumber][music.scaleDegree],

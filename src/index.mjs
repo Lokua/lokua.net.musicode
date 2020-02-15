@@ -1,6 +1,6 @@
+import dgram from 'dgram'
 import midiUtil from '@lokua/midi-util'
 
-import inputClockHandler from './inputClockHandler.mjs'
 import { partsPerQuarter } from './constants.mjs'
 import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
 import { onExit, safeCall } from './util.mjs'
@@ -50,7 +50,7 @@ export function getSongPositionTicks([, sixteenth, eighthBarCount]) {
 
 const defaultPortName = 'musicode'
 
-export default function musicode({ options = {}, handlers }) {
+export default function musicode({ handlers }) {
   const inputClockHandlers = new Map([
     [midiUtil.statusMap.get('start'), reset],
     [midiUtil.statusMap.get('stop'), reset],
@@ -63,12 +63,39 @@ export default function musicode({ options = {}, handlers }) {
     ],
   ])
 
-  const portCleanup = inputClockHandler({
-    portName: options.port || defaultPortName,
-    handlers: inputClockHandlers,
+  const server = dgram.createSocket('udp4')
+
+  server.on('message', data => {
+    const [deltaTime, ...message] = data
+      .toString()
+      .split(',')
+      .map(Number)
+
+    const handler = inputClockHandlers.get(message[0])
+
+    if (handler) {
+      handler(message, deltaTime)
+    }
   })
 
-  onExit(portCleanup)
+  server.on('error', err => {
+    console.error(err)
+    exitRoutine()
+  })
+
+  server.bind(33333)
+  console.log('udp server listening on port 33333')
+
+  onExit(exitRoutine)
+
+  exitRoutine.ran = false
+  function exitRoutine() {
+    if (!exitRoutine.ran) {
+      exitRoutine.ran = true
+      console.log('closing server')
+      server.close()
+    }
+  }
 }
 
 export { defaultPortName, isBarTick, isQuarterTick, is16thTick }

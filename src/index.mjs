@@ -1,9 +1,9 @@
 import midiUtil from '@lokua/midi-util'
 
-import inputClockHandler from './inputClockHandler.mjs'
+import { subscribe } from './inputClock.mjs'
 import { partsPerQuarter } from './constants.mjs'
 import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
-import { onExit, safeCall } from './util.mjs'
+import { safeCall } from './util.mjs'
 
 global.DEBUG = !!process.argv.find(s => s.includes('debug'))
 const m = midiUtil.statusMap.get.bind(midiUtil.statusMap)
@@ -56,7 +56,7 @@ musicode.isQuarterTick = isQuarterTick
 musicode.is16thTick = is16thTick
 
 export default function musicode({ handlers }) {
-  const inputClockHandlers = new Map([
+  const handlersByMidiMessage = new Map([
     [m('start'), reset],
     [m('stop'), reset],
     [m('clock'), updateCounts(handlers)],
@@ -68,10 +68,8 @@ export default function musicode({ handlers }) {
     ],
   ])
 
-  const portCleanup = inputClockHandler({
+  subscribe({
     portName: musicode.defaultPortName,
-    handlers: inputClockHandlers,
+    handlers: handlersByMidiMessage,
   })
-
-  onExit(portCleanup)
 }

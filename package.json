@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@lokua/midi-util": "1.0.0-beta.2",
+    "chalk": "3.0.0",
     "midi": "1.0.0"
   },
   "devDependencies": {

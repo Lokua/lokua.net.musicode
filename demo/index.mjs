@@ -1,6 +1,8 @@
 import readline from 'readline'
 import midi from 'midi'
 import midiUtil from '@lokua/midi-util'
+import chalk from 'chalk'
+
 import musicode from '../src/index.mjs'
 import parse from '../src/grammer/index.mjs'
 import { onExit } from '../src/util.mjs'
@@ -38,30 +40,42 @@ musicode({
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
+  prompt: chalk.magenta('> '),
 })
 
-read()
+rl.prompt()
 
-function read() {
-  rl.question('$ ', command => {
-    if (command === 'log') {
-      console.log({
-        music,
-        state: musicode.getState(),
-      })
-    } else if (command === 'exit') {
-      process.exit(0)
-    } else {
-      try {
-        const m = parse(command)
-        music = m
-      } catch (error) {
-        console.warn('invalid command')
-      }
+rl.on('line', line => {
+  if (line === 'log') {
+    console.log(
+      JSON.parse(
+        JSON.stringify({
+          music,
+          state: musicode.getState(),
+        }),
+      ),
+    )
+  } else if (line === 'exit') {
+    process.exit(0)
+  } else {
+    try {
+      const m = parse(line)
+      music = m
+      console.log(chalk.green(line))
+    } catch (error) {
+      handleParseError(error)
     }
+  }
 
-    read()
-  })
+  rl.prompt()
+})
+
+function handleParseError(error) {
+  if (error.name === 'SyntaxError') {
+    console.error(chalk.red(error.name), error.message)
+  } else {
+    console.error(error)
+  }
 }
 
 let ran = false

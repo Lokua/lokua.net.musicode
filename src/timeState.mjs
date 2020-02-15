@@ -13,23 +13,25 @@ const state = {
   ...initialState,
 }
 
-const getState = () => ({
-  ...state,
-})
-
 const resetState = () => {
   Object.assign(state, initialState)
 }
 
-const bus = new (class TimeStateBus extends EventEmitter {})()
+class TimeStateBus extends EventEmitter {
+  getState() {
+    return {
+      ...state,
+    }
+  }
+}
 
-bus.getState = getState
+const timeState = new TimeStateBus()
 
-bus.on('start', resetState)
+timeState.on('start', resetState)
 
-bus.on('stop', resetState)
+timeState.on('stop', resetState)
 
-bus.on('clock', () => {
+timeState.on('clock', () => {
   const clock = state.clock++
   let [bar, beat, sixteenth] = state.meter
 
@@ -46,21 +48,21 @@ bus.on('clock', () => {
     }
 
     state.meter = [bar, beat, sixteenth]
-    bus.emit('sixteenth', getState())
+    timeState.emit('sixteenth', timeState.getState())
   }
 })
 
 // TODO: test, this is not correct (does not set meter correctly)
-bus.on('songPosition', ({ message: [, sixteenth, eighthBarCount] }) => {
+timeState.on('songPosition', ({ message: [, sixteenth, eighthBarCount] }) => {
   const clock =
     sixteenth * (partsPerQuarter / 4) + eighthBarCount * partsPerQuarter * 4
 
   state.clock = clock - 1
-  bus.emit('clock')
+  timeState.emit('clock')
 })
 
-bus.on('log', () => {
-  console.log(getState())
+timeState.on('log', () => {
+  console.log(timeState.getState())
 })
 
-export default bus
+export default timeState

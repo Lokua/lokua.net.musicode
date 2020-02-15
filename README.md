@@ -4,6 +4,16 @@
 
 <img src="etc/musicode.svg">
 
+---
+
+TODO:
+
+1. rename "tick" key of instruction "sixteenth"
+2. stream debug logs to file since they interfere with terminal input
+3. need history since rl doesn't restore on new sessions (?)
+
+---
+
 ## Thinking out loud
 
 The first basic idea for a procedural MIDI DSL: _"at TIME do X"_
@@ -46,17 +56,3 @@ every beat...
 ```
 e *.foo s 1
 ```
-
----
-
-GOAL 1: turn `e *.*.* pc 0` into a midi output stream
-
----
-
-IPC / dual process ideas:
-
-1. TCP
-2. UDP
-3. Electron multiple renderer processes
-4. Websockets
-5. Other IPC?

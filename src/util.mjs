@@ -1,8 +1,4 @@
-export function safeCall(method, ...args) {
-  if (method) {
-    return method(...args)
-  }
-}
+import { inspect } from 'util'
 
 export function debug(...args) {
   if (global.DEBUG) {
@@ -10,8 +6,18 @@ export function debug(...args) {
   }
 }
 
+export function inspectDeep(message) {
+  return inspect(message, false, null, true)
+}
+
 export function onExit(cleanup) {
   process.on('exit', cleanup)
   process.on('SIGINT', cleanup)
   process.on('SIGTERM', cleanup)
+}
+
+export function safeCall(method, ...args) {
+  if (method) {
+    return method(...args)
+  }
 }

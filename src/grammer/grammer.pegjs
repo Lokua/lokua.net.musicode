@@ -16,7 +16,7 @@ operator "operator" = operator:[e] {
   }
 }
 
-meter = value:(m [.] m [.] m / m [.] m / m)+ {
+meter = value:(m [.] m [.] m / m [.] m / m) {
   const [bar, beat, sixteenth] = value.filter(x => x !== '.')
   const defaultValue = { 
     type: 'number', 
@@ -32,8 +32,12 @@ meter = value:(m [.] m [.] m / m [.] m / m)+ {
 
 m = metricList / metric
 
-metricList = wrapped:(metric [,] metric [,]?)+ {
-  const [value] = wrapped
+metricList = wrapped:((metric[,])+ metric)+ {
+  const [withTrailingComma, last] = wrapped[0]
+  const value = withTrailingComma
+    .flat()
+    .concat(last)
+    .filter(x => x !== ',' && x !== null)
 
   return {
     type: 'list',

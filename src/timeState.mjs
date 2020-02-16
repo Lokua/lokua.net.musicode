@@ -51,6 +51,10 @@ timeState.on('clock', () => {
     state.meter = [bar, beat, sixteenth]
     timeState.emit('sixteenth', timeState.getState())
   }
+
+  if (clock % 128 === 0) {
+    debug(`clock check: ${clock}`)
+  }
 })
 
 // TODO: test, this is not correct (does not set meter correctly)

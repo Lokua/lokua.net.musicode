@@ -14,13 +14,17 @@ export default function exec({ timeState, instructions }) {
 
 function applyTimeStateForInstruction(timeState) {
   return instruction => {
-    if (canPlay({ timeState, music: instruction })) {
+    const can = canPlay({ timeState, music: instruction })
+
+    if (can) {
       output.sendMessage([
         midiUtil.NOTE_ON,
         [[60, 70, 80, 90]][instruction.scaleNumber][instruction.scaleDegree],
         127,
       ])
     }
+
+    return can
   }
 }
 
@@ -50,11 +54,15 @@ function canPlayMetric({
   }
 
   if (type === metricTypes.modulus) {
-    return key === 'bar'
-      ? meterValue % value === 0
-      : key === 'beat'
-      ? (timeState.count / 4) % value === 0
-      : timeState.count % value === 0
+    if (key === 'bar') {
+      return metricTypes % value === 0
+    }
+
+    if (key === 'beat') {
+      return Math.floor(timeState.sixteenths / 4) % value === 0
+    }
+
+    return timeState.sixteenths % value === 0
   }
 
   if (type === metricTypes.list) {

@@ -1,4 +1,6 @@
+import fs from 'fs'
 import chalk from 'chalk'
+
 import parse from './grammer/index.mjs'
 import commandBus from './commandBus.mjs'
 import exec from './exec.mjs'
@@ -7,7 +9,10 @@ import inputClockHandlers from './inputClockHandlers.mjs'
 import instructionBus from './instructionBus.mjs'
 import timeState from './timeState.mjs'
 import { inspectDeep } from './util.mjs'
-import * as scales from './scales.mjs'
+import Scales from './scales.mjs'
+import defaultConfig from './defaultConfig.mjs'
+
+const scales = new Scales(defaultConfig)
 
 checkDebug()
 
@@ -28,7 +33,7 @@ commandBus
     instructionBus.emit('remove', command)
   })
   .on('register', ({ command }) => {
-    scales.register(command)
+    scales.addScale(command.replace('register '))
   })
   // eslint-disable-next-line no-unused-vars
   .on('unregister', ({ command }) => {
@@ -70,7 +75,7 @@ function getData() {
   return {
     timeState: timeState.getState(),
     instructions: instructionBus.getInstructions(),
-    scales: scales.getScales(),
+    ...scales.getData(),
   }
 }
 

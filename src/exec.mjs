@@ -8,26 +8,27 @@ const output = new midi.Output()
 
 output.openVirtualPort('musicode')
 
-export default function exec({ timeState, instructions, scales }) {
-  instructions.forEach(applyDataForInstruction({ timeState, scales }))
+export default function exec({ timeState, instructions, scales, velocities }) {
+  instructions.forEach(
+    applyDataForInstruction({
+      timeState,
+      scales,
+      velocities,
+    }),
+  )
 }
 
-function applyDataForInstruction({ timeState, scales }) {
+function applyDataForInstruction({ timeState, scales, velocities }) {
   return instruction => {
-    const can = canPlay({ timeState, music: instruction })
-
-    const TEMP_OFFSET = 60
-
-    if (can) {
+    if (canPlay({ timeState, music: instruction })) {
+      const TEMP_OFFSET = 60
       output.sendMessage([
         midiUtil.NOTE_ON,
         scales[instruction.scaleNumber].values[instruction.scaleDegree] +
           TEMP_OFFSET,
-        127,
+        velocities[0],
       ])
     }
-
-    return can
   }
 }
 

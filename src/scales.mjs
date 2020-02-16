@@ -1,34 +1,44 @@
-const data = []
-
-export function getScales() {
-  return data.slice()
-}
-
-export function register(scale) {
-  return data.push(parse(scale))
-}
-
-export function unregister(index) {
-  data.splice(index, 1)
-}
-
-export function findByName(name) {
-  return data.find(scale => scale.name === name)
-}
-
-export function findByIndex(index) {
-  return data[index]
-}
-
-function parse(scale) {
-  const s = scale.replace('register ', '')
-  const name = s.slice(0, s.indexOf(' ')).trim()
-  const values = s.replace(name, '')
-
-  const parsed = {
-    name,
-    values: values.split(',').map(s => Number(s.trim())),
+export default class Scales {
+  constructor({ scales, velocities, durations }) {
+    this.scales = scales
+    this.velocities = velocities
+    this.durations = durations
   }
 
-  return parsed
+  getData() {
+    return {
+      scales: this.scales,
+      velocities: this.velocities,
+      durations: this.durations,
+    }
+  }
+
+  setVelocities(velocities) {
+    this.velocities = velocities
+  }
+
+  setDurations(durations) {
+    this.velocities = durations
+  }
+
+  addScale(scale) {
+    this.scales.push(typeof scale === 'object' ? scale : this.parse(scale))
+  }
+
+  removeScale(scale) {
+    this.scales.splice(
+      this.scales.findIndex(s => s.name === scale.name),
+      1,
+    )
+  }
+
+  parse(commaSeparated) {
+    const name = commaSeparated.slice(0, commaSeparated.indexOf(' ')).trim()
+    const values = commaSeparated.replace(name, '')
+
+    return {
+      name,
+      values: values.split(',').map(s => Number(s.trim())),
+    }
+  }
 }

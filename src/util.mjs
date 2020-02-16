@@ -30,6 +30,10 @@ export function onExit(cleanup) {
   process.on('SIGTERM', cleanup)
 }
 
+export function rotate(array, n) {
+  return [...array.slice(array.length - n), ...array.slice(0, array.length - n)]
+}
+
 export function safeCall(method, ...args) {
   if (method) {
     return method(...args)

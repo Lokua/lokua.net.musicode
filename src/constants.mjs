@@ -1,8 +1,9 @@
 export const partsPerQuarter = 24
 
-export const metricTypes = {
+export const valueTypes = {
   wildcard: 'wildcard',
   number: 'number',
   list: 'list',
   modulus: 'modulus',
+  rotatable: 'rotatable',
 }

@@ -23,7 +23,6 @@
     "chokidar-cli": "2.1.0",
     "eslint": "6.1.0",
     "eslint-config-lokua": "8.0.0",
-    "pegjs": "0.10.0",
     "prettier": "1.19.1"
   }
 }

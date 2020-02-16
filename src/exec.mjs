@@ -1,12 +1,16 @@
+import EventEmitter from 'events'
 import midi from 'midi'
 import midiUtil from '@lokua/midi-util'
 
-import { metricTypes } from './constants.mjs'
+import { valueTypes } from './constants.mjs'
 import { debug, onExit } from './util.mjs'
 
 const output = new midi.Output()
-
 output.openVirtualPort('musicode')
+
+const bus = new EventEmitter()
+exec.emit = bus.emit.bind(bus)
+exec.on = bus.on.bind(bus)
 
 export default function exec({
   timeState,
@@ -34,8 +38,14 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
         getNote({ scales, instruction }) + TEMP_OFFSET,
         velocities[0],
       ]
-      debug(`ouput.sendMessage([${message}])`)
       output.sendMessage(message)
+      debug(`ouput.sendMessage([${message}])`)
+
+      if (includesRotatable(instruction)) {
+        exec.emit('cursor', {
+          instruction,
+        })
+      }
     }
   }
 }
@@ -57,15 +67,15 @@ function canPlayMetric({
   meterValue,
   instructionValue: { type, value },
 }) {
-  if (type === metricTypes.wildcard) {
+  if (type === valueTypes.wildcard) {
     return true
   }
 
-  if (type === metricTypes.number) {
+  if (type === valueTypes.number) {
     return value === (key === 'bar' ? meterValue : meterValue % 4)
   }
 
-  if (type === metricTypes.modulus) {
+  if (type === valueTypes.modulus) {
     if (key === 'bar') {
       return meterValue % value === 0
     }
@@ -77,7 +87,7 @@ function canPlayMetric({
     return timeState.sixteenths % value === 0
   }
 
-  if (type === metricTypes.list) {
+  if (type === valueTypes.list) {
     return value.some(v =>
       canPlayMetric({
         key,
@@ -91,13 +101,20 @@ function canPlayMetric({
 
 export function getNote({ scales, instruction }) {
   const scale = scales[instruction.scaleNumber].values
-  const index =
-    instruction.scaleDegree.type === 'number'
-      ? instruction.scaleDegree.value
-      : // TODO: use cursor
-        0
 
-  return scale[index]
+  if (instruction.scaleDegree.type === valueTypes.number) {
+    return scale[instruction.scaleDegree.value]
+  }
+
+  if (instruction.scaleDegree.type === valueTypes.rotatable) {
+    return scale[instruction.scaleDegree.value[instruction.scaleDegree.cursor]]
+  }
+}
+
+function includesRotatable(instruction) {
+  return Object.values(instruction).some(
+    x => typeof x === 'object' && x.type === valueTypes.rotatable,
+  )
 }
 
 onExit(() => {

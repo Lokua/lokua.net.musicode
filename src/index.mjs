@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 
-import parser from './parser/index.mjs'
+import parse from './parser/index.mjs'
 import commandBus from './commandBus.mjs'
 import exec from './exec.mjs'
 import { subscribe } from './inputClock.mjs'
@@ -18,7 +18,7 @@ checkDebug()
 commandBus
   .on('instruction', ({ command }) => {
     try {
-      const instruction = parser(command)
+      const instruction = parse(command)
       instructionBus.emit('instruction', {
         command,
         instruction,
@@ -63,6 +63,10 @@ instructionBus.on('duplicateInstruction', ({ command }) => {
 
 timeState.on('sixteenth', () => {
   exec(getData())
+})
+
+exec.on('cursor', ({ instruction }) => {
+  instructionBus.rotateCursor(instruction)
 })
 
 subscribe({

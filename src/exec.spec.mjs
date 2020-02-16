@@ -1,6 +1,6 @@
 import assert from 'assert'
 import test from './test/index.mjs'
-import { metricTypes } from './constants.mjs'
+import { valueTypes } from './constants.mjs'
 import { canPlay, getNote } from './exec.mjs'
 
 test('canPlay:1.1.1', () => {
@@ -12,15 +12,15 @@ test('canPlay:1.1.1', () => {
       },
       music: {
         bar: {
-          type: metricTypes.number,
+          type: valueTypes.number,
           value: 0,
         },
         beat: {
-          type: metricTypes.number,
+          type: valueTypes.number,
           value: 0,
         },
         sixteenth: {
-          type: metricTypes.number,
+          type: valueTypes.number,
           value: 0,
         },
       },
@@ -37,13 +37,13 @@ test('canPlay:*.*.%2', () => {
       },
       music: {
         bar: {
-          type: metricTypes.wildcard,
+          type: valueTypes.wildcard,
         },
         beat: {
-          type: metricTypes.wildcard,
+          type: valueTypes.wildcard,
         },
         sixteenth: {
-          type: metricTypes.modulus,
+          type: valueTypes.modulus,
           value: 2,
         },
       },
@@ -60,15 +60,15 @@ test('canPlay:%3', () => {
       },
       music: {
         bar: {
-          type: metricTypes.modulus,
+          type: valueTypes.modulus,
           value: 3,
         },
         beat: {
-          type: metricTypes.number,
+          type: valueTypes.number,
           value: 0,
         },
         sixteenth: {
-          type: metricTypes.number,
+          type: valueTypes.number,
           value: 0,
         },
       },
@@ -85,17 +85,17 @@ test('canPlay:*.1,3', () => {
       },
       music: {
         bar: {
-          type: metricTypes.wildcard,
+          type: valueTypes.wildcard,
         },
         beat: {
-          type: metricTypes.list,
+          type: valueTypes.list,
           value: [
-            { type: metricTypes.number, value: 0 },
-            { type: metricTypes.number, value: 2 },
+            { type: valueTypes.number, value: 0 },
+            { type: valueTypes.number, value: 2 },
           ],
         },
         sixteenth: {
-          type: metricTypes.number,
+          type: valueTypes.number,
           value: 0,
         },
       },

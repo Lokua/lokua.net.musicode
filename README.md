@@ -167,6 +167,8 @@ Basic overview:
 - pass config file to program
 - allow specifying scales in traditional notes
 - add offset (bar|beat|sixteenth) command to resync
+- cc
+- make parsed types a constant enum
 
 Expand syntax (thinking out loud):
 

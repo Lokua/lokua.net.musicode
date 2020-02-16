@@ -67,7 +67,7 @@ function parseMetric(metric) {
   if (!metric.includes(',') && metric.startsWith('%')) {
     return {
       type: 'modulus',
-      value: Number(metric.slice(1)) - 1,
+      value: Number(metric.slice(1)),
     }
   }
 

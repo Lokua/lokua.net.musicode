@@ -7,7 +7,7 @@
     "start:watch": "chokidar \"**/*.mjs\" -c \"npm start -- --debug\"",
     "start:debug": "npm start -- --debug",
     "start": "NODE_OPTIONS=--no-warnings node src/index.mjs",
-    "test": "NODE_OPTIONS=--no-warnings node src/test-runner.mjs",
+    "test": "NODE_OPTIONS=--no-warnings node src/test/test-runner.mjs",
     "lint": "node_modules/.bin/prettier",
     "peg": "pegjs -o src/grammer/grammer.js src/grammer/grammer.pegjs"
   },

@@ -3,7 +3,11 @@ import path from 'path'
 
 walkSync(`${process.cwd()}/src`).forEach(filename => {
   if (filename.endsWith('.spec.mjs')) {
-    import(filename)
+    console.info('importing', filename)
+    import(filename).catch(err => {
+      console.error(err)
+      process.exit(0)
+    })
   }
 })
 

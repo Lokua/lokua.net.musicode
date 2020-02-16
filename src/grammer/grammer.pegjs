@@ -4,26 +4,69 @@
   }
 }
 
-command "command" = command:operator space timeSpec space scaleLookup
+command "command" = command:(operator space meter space scaleLookup) {
+  return command
+    .filter(x => x !== null)
+    .reduce((acc, item) => ({ ...acc, ...item }), {})
+}
 
-operator "operator" = operator:[el] {
+operator "operator" = operator:[e] {
   return {
     operator: operators[operator],
   }
 }
 
-timeSpec "timeSpec" = timeSpec:(tick dot tick dot tick) {
-  const [bar, beat, tick] = timeSpec.filter(x => x !== '.')
+meter = value:(m [.] m [.] m / m [.] m / m)+ {
+  const [bar, beat, sixteenth] = value.filter(x => x !== '.')
+  const defaultValue = { 
+    type: 'number', 
+    value: 0 
+  }
   
   return {
     bar,
-    beat,
-    tick,
+    beat: beat || defaultValue,
+    sixteenth: sixteenth || defaultValue,
   }
 }
 
+m = metricList / metric
+
+metricList = wrapped:(metric [,] metric [,]?)+ {
+  const [value] = wrapped
+
+  return {
+    type: 'list',
+    value: value.filter(x => x !== ',' && x !== null),
+  }
+}
+
+metric = value:(digit / wildcard / modulus) {
+  return value
+}
+
+wildcard = "*" { 
+  return { 
+    type: 'wildcard' 
+  }  
+}
+
+modulus = value:$([%][0-9])+ { 
+  return { 
+    type: 'modulus', 
+    value: Number(value.slice(1))
+  }
+}
+
+digit = value:[0-9]+ { 
+  return { 
+    type: 'number', 
+    value: Number(value.join('')) 
+  } 
+}
+
 scaleLookup "scaleLookup" = scale:("s" [1-9]* space [1-9]*) {
-  const [s, scaleNumber = [], , scaleDegree] = scale
+  const [, scaleNumber = [], , scaleDegree] = scale
   
   return {
     scaleNumber: Number(scaleNumber[0]) - 1 || 0,
@@ -31,6 +74,6 @@ scaleLookup "scaleLookup" = scale:("s" [1-9]* space [1-9]*) {
   }
 }
 
-tick = n:[1-4*] { return n === '*' ? '*' : n - 1 }
-dot = [.]
-space "space" = " "+ { return null }
+space = " "+ { 
+  return null 
+}

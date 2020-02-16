@@ -61,7 +61,7 @@ modulus = value:$([%][0-9])+ {
 digit = value:[0-9]+ { 
   return { 
     type: 'number', 
-    value: Number(value.join('')) 
+    value: Number(value.join('')) - 1
   } 
 }
 

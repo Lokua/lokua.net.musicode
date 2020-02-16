@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import readline from 'readline'
 import chalk from 'chalk'
 
-import { debug, inspectDeep, onExit } from './util.mjs'
+import { debug, onExit } from './util.mjs'
 
 const commandBus = new (class CommandBus extends EventEmitter {})()
 
@@ -19,9 +19,7 @@ commandBus.on('write', data => {
   rl.write(data)
 })
 
-commandBus.on('writeLine', data => {
-  console.log(inspectDeep(data))
-})
+commandBus.on('writeLine', console.log)
 
 commandBus.on('warn', message => {
   console.log(chalk.yellow(message))
@@ -40,11 +38,11 @@ commandBus.start = () => {
 
   rl.on('line', line => {
     switch (line.trim()) {
+      case 'log:state':
+        commandBus.emit('logState')
+        break
       case 'log':
         commandBus.emit('log')
-        break
-      case 'log commands':
-        commandBus.emit('logCommands')
         break
 
       case 'exit':

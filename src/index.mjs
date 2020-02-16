@@ -6,6 +6,7 @@ import { subscribe } from './inputClock.mjs'
 import inputClockHandlers from './inputClockHandlers.mjs'
 import instructionBus from './instructionBus.mjs'
 import timeState from './timeState.mjs'
+import { inspectDeep } from './util.mjs'
 
 checkDebug()
 
@@ -21,17 +22,18 @@ commandBus
       handleParseError(error)
     }
   })
-  .on('log', () => {
-    commandBus.emit('writeLine', getData())
+  .on('logState', () => {
+    commandBus.emit('writeLine', inspectDeep(getData()))
   })
-  .on('logCommands', () => {
-    commandBus.emit(
-      'info',
-      instructionBus
-        .getInstructions()
-        .map((instruction, index) => `${index + 1}: ${instruction.raw}`)
-        .join('\n'),
-    )
+  .on('log', () => {
+    instructionBus
+      .getInstructions()
+      .forEach((instruction, index) =>
+        commandBus.emit(
+          'writeLine',
+          `${chalk.green(index + 1)}: ${chalk.cyan(instruction.raw)}`,
+        ),
+      )
   })
   .on('exit', () => {
     process.exit(0)

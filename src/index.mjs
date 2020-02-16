@@ -1,7 +1,6 @@
-import fs from 'fs'
 import chalk from 'chalk'
 
-import parse from './grammer/index.mjs'
+import parser from './parser/index.mjs'
 import commandBus from './commandBus.mjs'
 import exec from './exec.mjs'
 import { subscribe } from './inputClock.mjs'
@@ -19,7 +18,7 @@ checkDebug()
 commandBus
   .on('instruction', ({ command }) => {
     try {
-      const instruction = parse(command)
+      const instruction = parser(command)
       instructionBus.emit('instruction', {
         command,
         instruction,

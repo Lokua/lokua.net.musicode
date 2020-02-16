@@ -8,12 +8,19 @@ const output = new midi.Output()
 
 output.openVirtualPort('musicode')
 
-export default function exec({ timeState, instructions, scales, velocities }) {
+export default function exec({
+  timeState,
+  instructions,
+  scales,
+  velocities,
+  durations,
+}) {
   instructions.forEach(
     applyDataForInstruction({
       timeState,
       scales,
       velocities,
+      durations,
     }),
   )
 }
@@ -22,12 +29,13 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
   return instruction => {
     if (canPlay({ timeState, music: instruction })) {
       const TEMP_OFFSET = 60
-      output.sendMessage([
+      const message = [
         midiUtil.NOTE_ON,
-        scales[instruction.scaleNumber].values[instruction.scaleDegree] +
-          TEMP_OFFSET,
+        getNote({ scales, instruction }) + TEMP_OFFSET,
         velocities[0],
-      ])
+      ]
+      debug(`ouput.sendMessage([${message}])`)
+      output.sendMessage(message)
     }
   }
 }
@@ -81,11 +89,18 @@ function canPlayMetric({
   }
 }
 
-let ran = false
+export function getNote({ scales, instruction }) {
+  const scale = scales[instruction.scaleNumber].values
+  const index =
+    instruction.scaleDegree.type === 'number'
+      ? instruction.scaleDegree.value
+      : // TODO: use cursor
+        0
+
+  return scale[index]
+}
+
 onExit(() => {
-  if (!ran) {
-    ran = true
-    debug('closing output port')
-    output.closePort()
-  }
+  debug('onExit: closing output port')
+  output.closePort()
 })

@@ -164,9 +164,9 @@ Basic overview:
 - export
 - specify octave, duration, velocity
 - transpose instruction(s)
-- POC evaluate regexp parsing solution due to PEG limitations
 - pass config file to program
 - allow specifying scales in traditional notes
+- add offset (bar|beat|sixteenth) command to resync
 
 Expand syntax (thinking out loud):
 

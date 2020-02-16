@@ -19,12 +19,8 @@ export function subscribe({ portName, handlers }) {
 
   input.openVirtualPort(portName)
 
-  let ran = false
   onExit(() => {
-    if (!ran) {
-      ran = true
-      debug('closing input port')
-      input.closePort()
-    }
+    debug('onExit: closing input port')
+    input.closePort()
   })
 }

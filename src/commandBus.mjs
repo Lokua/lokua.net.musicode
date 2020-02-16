@@ -88,11 +88,7 @@ commandBus.start = () => {
 
 export default commandBus
 
-let ran = false
 onExit(() => {
-  if (!ran) {
-    ran = true
-    debug('closing readline instance')
-    rl.close()
-  }
+  debug('onExit: closing readline instance')
+  rl.close()
 })

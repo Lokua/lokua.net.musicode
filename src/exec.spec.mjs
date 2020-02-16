@@ -8,7 +8,7 @@ test('canPlay:1.1.1', () => {
     canPlay({
       timeState: {
         meter: [0, 0, 0],
-        count: 0,
+        sixteenths: 0,
       },
       music: {
         bar: {
@@ -33,7 +33,7 @@ test('canPlay:*.*.%2', () => {
     canPlay({
       timeState: {
         meter: [0, 0, 2],
-        count: 8,
+        sixteenths: 8,
       },
       music: {
         bar: {
@@ -56,7 +56,7 @@ test('canPlay:%3', () => {
     canPlay({
       timeState: {
         meter: [12, 0, 0],
-        count: 0,
+        sixteenths: 0,
       },
       music: {
         bar: {
@@ -81,7 +81,7 @@ test('canPlay:*.1,3', () => {
     canPlay({
       timeState: {
         meter: [0, 2, 0],
-        count: 0,
+        sixteenths: 0,
       },
       music: {
         bar: {

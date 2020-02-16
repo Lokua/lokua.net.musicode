@@ -37,22 +37,43 @@ commandBus.start = () => {
   rl.prompt()
 
   rl.on('line', line => {
-    switch (line.trim()) {
+    const command = line.trim()
+
+    switch (command) {
+      case 'log':
+        commandBus.emit('log')
+        break
+
+      case 'log:scales':
+        commandBus.emit('logScales')
+        break
+
       case 'log:state':
         commandBus.emit('logState')
         break
-      case 'log':
-        commandBus.emit('log')
+
+      case 'reset':
+        commandBus.emit('reset')
         break
 
       case 'exit':
         commandBus.emit('exit')
         break
 
-      default:
-        commandBus.emit('command', {
-          command: line,
-        })
+      default: {
+        const firstWord = command.split(' ')[0].trim()
+
+        if (/register|unregister|remove/.test(firstWord)) {
+          commandBus.emit(firstWord, {
+            command,
+          })
+        } else {
+          commandBus.emit('instruction', {
+            command,
+          })
+        }
+        break
+      }
     }
 
     rl.prompt()

@@ -8,18 +8,21 @@ const output = new midi.Output()
 
 output.openVirtualPort('musicode')
 
-export default function exec({ timeState, instructions }) {
-  instructions.forEach(applyTimeStateForInstruction(timeState))
+export default function exec({ timeState, instructions, scales }) {
+  instructions.forEach(applyDataForInstruction({ timeState, scales }))
 }
 
-function applyTimeStateForInstruction(timeState) {
+function applyDataForInstruction({ timeState, scales }) {
   return instruction => {
     const can = canPlay({ timeState, music: instruction })
+
+    const TEMP_OFFSET = 60
 
     if (can) {
       output.sendMessage([
         midiUtil.NOTE_ON,
-        [[60, 70, 80, 90]][instruction.scaleNumber][instruction.scaleDegree],
+        scales[instruction.scaleNumber].values[instruction.scaleDegree] +
+          TEMP_OFFSET,
         127,
       ])
     }
@@ -55,7 +58,7 @@ function canPlayMetric({
 
   if (type === metricTypes.modulus) {
     if (key === 'bar') {
-      return metricTypes % value === 0
+      return meterValue % value === 0
     }
 
     if (key === 'beat') {

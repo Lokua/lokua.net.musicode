@@ -7,11 +7,12 @@ import inputClockHandlers from './inputClockHandlers.mjs'
 import instructionBus from './instructionBus.mjs'
 import timeState from './timeState.mjs'
 import { inspectDeep } from './util.mjs'
+import * as scales from './scales.mjs'
 
 checkDebug()
 
 commandBus
-  .on('command', ({ command }) => {
+  .on('instruction', ({ command }) => {
     try {
       const instruction = parse(command)
       instructionBus.emit('instruction', {
@@ -21,6 +22,18 @@ commandBus
     } catch (error) {
       handleParseError(error)
     }
+  })
+  .on('reset', timeState.resetState)
+  .on('remove', ({ command }) => {
+    instructionBus.emit('remove', command)
+  })
+  .on('register', ({ command }) => {
+    scales.register(command)
+  })
+  // eslint-disable-next-line no-unused-vars
+  .on('unregister', ({ command }) => {
+    commandBus.emit('warn', 'unregister is not implemented')
+    // scales.unregister(command)
   })
   .on('logState', () => {
     commandBus.emit('writeLine', inspectDeep(getData()))
@@ -57,6 +70,7 @@ function getData() {
   return {
     timeState: timeState.getState(),
     instructions: instructionBus.getInstructions(),
+    scales: scales.getScales(),
   }
 }
 

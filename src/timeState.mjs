@@ -14,23 +14,23 @@ const state = {
   ...initialState,
 }
 
-const resetState = () => {
-  Object.assign(state, initialState)
-}
-
 class TimeStateBus extends EventEmitter {
   getState() {
     return {
       ...state,
     }
   }
+
+  resetState() {
+    Object.assign(state, initialState)
+  }
 }
 
 const timeState = new TimeStateBus()
 
-timeState.on('start', resetState)
+timeState.on('start', timeState.resetState)
 
-timeState.on('stop', resetState)
+timeState.on('stop', timeState.resetState)
 
 timeState.on('clock', () => {
   const clock = state.clock++

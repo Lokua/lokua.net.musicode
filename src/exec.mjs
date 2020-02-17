@@ -36,7 +36,10 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
       const message = [
         midiUtil.NOTE_ON,
         getNote({ scales, instruction }) + TEMP_OFFSET,
-        velocities[0],
+        genericRotatableGet('velocity', {
+          lookupArray: velocities,
+          instruction,
+        }),
       ]
       output.sendMessage(message)
       debug(`ouput.sendMessage([${message}])`)
@@ -70,48 +73,56 @@ function canPlayMetric({
   meterValue,
   instructionValue: { type, value },
 }) {
-  if (type === valueTypes.wildcard) {
-    return true
-  }
-
-  if (type === valueTypes.number) {
-    return value === (key === 'bar' ? meterValue : meterValue % 4)
-  }
-
-  if (type === valueTypes.modulus) {
-    if (key === 'bar') {
-      return meterValue % value === 0
-    }
-
-    if (key === 'beat') {
-      return Math.floor(timeState.sixteenths / 4) % value === 0
-    }
-
-    return timeState.sixteenths % value === 0
-  }
-
-  if (type === valueTypes.list) {
-    return value.some(v =>
-      canPlayMetric({
-        key,
-        timeState,
-        meterValue,
-        instructionValue: v,
-      }),
-    )
-  }
+  return {
+    [valueTypes.wildcard]: () => true,
+    [valueTypes.number]: () =>
+      value === (key === 'bar' ? meterValue : meterValue % 4),
+    [valueTypes.modulus]: () =>
+      key === 'bar'
+        ? meterValue % value === 0
+        : key === 'beat'
+        ? Math.floor(timeState.sixteenths / 4) % value === 0
+        : timeState.sixteenths % value === 0,
+    [valueTypes.list]: () =>
+      value.some(v =>
+        canPlayMetric({
+          key,
+          timeState,
+          meterValue,
+          instructionValue: v,
+        }),
+      ),
+  }[type]()
 }
 
-export function getNote({ scales, instruction }) {
-  const scale = scales[instruction.scaleNumber].values
+export function getNote({
+  scales,
+  instruction: {
+    scaleNumber,
+    scaleDegree: { type, value, cursor },
+  },
+}) {
+  const scale = scales[scaleNumber].values
 
-  if (instruction.scaleDegree.type === valueTypes.number) {
-    return scale[instruction.scaleDegree.value]
-  }
+  return {
+    [valueTypes.number]: () => scale[value],
+    [valueTypes.rotatable]: () => scale[value[cursor]],
+  }[type]()
+}
 
-  if (instruction.scaleDegree.type === valueTypes.rotatable) {
-    return scale[instruction.scaleDegree.value[instruction.scaleDegree.cursor]]
-  }
+export function genericRotatableGet(
+  key,
+  {
+    lookupArray,
+    instruction: {
+      [key]: { type, value, cursor },
+    },
+  },
+) {
+  return {
+    [valueTypes.number]: () => lookupArray[value],
+    [valueTypes.rotatable]: () => lookupArray[value[cursor]],
+  }[type]()
 }
 
 function includesRotatable(instruction) {

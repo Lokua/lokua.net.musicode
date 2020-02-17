@@ -63,15 +63,11 @@ commandBus.start = () => {
       default: {
         const firstWord = command.split(' ')[0].trim()
 
-        console.info({ firstWord })
-
         if (/(un)?register|remove|(un)?mute/.test(firstWord)) {
-          console.info('this')
           commandBus.emit(firstWord, {
             command,
           })
         } else {
-          console.info('that')
           commandBus.emit('instruction', {
             command,
           })

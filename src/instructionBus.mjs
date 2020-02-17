@@ -44,7 +44,6 @@ const createMuteHandler = mute => ({ instructionId }) => {
       instruction.mute = mute
     })
   } else if (instructionId.type === valueTypes.number) {
-    console.log('setting to', mute)
     instructions[instructionId.value].mute = mute
   }
 }

@@ -29,7 +29,6 @@ class TimeStateBus extends EventEmitter {
 const timeState = new TimeStateBus()
 
 timeState.on('start', timeState.resetState)
-
 timeState.on('stop', timeState.resetState)
 
 timeState.on('clock', () => {
@@ -64,10 +63,6 @@ timeState.on('songPosition', ({ message: [, sixteenth, eighthBarCount] }) => {
 
   state.clock = clock - 1
   timeState.emit('clock')
-})
-
-timeState.on('log', () => {
-  console.log(timeState.getState())
 })
 
 export default timeState

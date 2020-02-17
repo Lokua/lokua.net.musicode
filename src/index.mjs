@@ -1,17 +1,19 @@
 import chalk from 'chalk'
 
 import parse from './parser/index.mjs'
+import { valueTypes } from './constants.mjs'
 import commandBus from './commandBus.mjs'
 import exec from './exec.mjs'
 import { subscribe } from './inputClock.mjs'
 import inputClockHandlers from './inputClockHandlers.mjs'
-import instructionBus from './instructionBus.mjs'
+import Instructions from './Instructions.mjs'
 import timeState from './timeState.mjs'
 import { inspectDeep } from './util.mjs'
 import Scales from './scales.mjs'
 import defaultConfig from './defaultConfig.mjs'
 
 const scales = new Scales(defaultConfig)
+const instructions = new Instructions()
 
 checkDebug()
 
@@ -19,37 +21,41 @@ commandBus
   .on('instruction', ({ command }) => {
     try {
       const instruction = parse(command)
-      instructionBus.emit('instruction', {
-        command,
+      instructions.push({
+        id: command,
         instruction,
       })
     } catch (error) {
-      handleParseError(error)
+      handleError(error)
     }
   })
   .on('mute', ({ command }) => {
     try {
-      const instructionId = parse(command)
-      instructionBus.emit('mute', {
-        instructionId,
-      })
+      const parsed = parse(command)
+      if (parsed.type === valueTypes.number) {
+        instructions[parsed.value].mute()
+      } else {
+        instructions.mute()
+      }
     } catch (error) {
-      handleParseError(error)
+      handleError(error)
     }
   })
   .on('unmute', ({ command }) => {
     try {
-      const instructionId = parse(command)
-      instructionBus.emit('unmute', {
-        instructionId,
-      })
+      const parsed = parse(command)
+      if (parsed.type === valueTypes.number) {
+        instructions[parsed.value].unmute()
+      } else {
+        instructions.unmute()
+      }
     } catch (error) {
-      handleParseError(error)
+      handleError(error)
     }
   })
   .on('reset', timeState.resetState)
   .on('remove', ({ command }) => {
-    instructionBus.emit('remove', command)
+    instructions.remove(command)
   })
   .on('register', ({ command }) => {
     scales.addScale(command.replace('register '))
@@ -63,30 +69,20 @@ commandBus
     commandBus.emit('writeLine', inspectDeep(getData()))
   })
   .on('log', () => {
-    instructionBus
-      .getInstructions()
-      .forEach((instruction, index) =>
-        commandBus.emit(
-          'writeLine',
-          `${chalk.green(index + 1)}: ${chalk.cyan(instruction.raw)}`,
-        ),
-      )
+    instructions.forEach((instruction, index) =>
+      commandBus.emit(
+        'writeLine',
+        `${chalk.green(index + 1)}: ${chalk.cyan(instruction.raw)}`,
+      ),
+    )
   })
   .on('exit', () => {
     process.exit(0)
   })
   .start()
 
-instructionBus.on('duplicateInstruction', ({ command }) => {
-  commandBus.emit('warn', `ignoring duplicated command: ${command}`)
-})
-
 timeState.on('sixteenth', () => {
   exec(getData())
-})
-
-exec.on('cursor', ({ instruction }) => {
-  instructionBus.rotateCursor(instruction)
 })
 
 subscribe({
@@ -97,13 +93,16 @@ subscribe({
 function getData() {
   return {
     timeState: timeState.getState(),
-    instructions: instructionBus.getInstructions(),
+    instructions,
     ...scales.getData(),
   }
 }
 
-function handleParseError(error) {
-  if (error.name === 'SyntaxError') {
+function handleError(error) {
+  if (
+    error.name === 'SyntaxError' ||
+    error instanceof Instructions.DuplicateInstructionError
+  ) {
     console.error(chalk.red(error.name), error.message)
   } else {
     console.error(error)

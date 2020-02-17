@@ -1,4 +1,3 @@
-import EventEmitter from 'events'
 import midi from 'midi'
 import midiUtil from '@lokua/midi-util'
 
@@ -7,10 +6,6 @@ import { debug, onExit } from './util.mjs'
 
 const output = new midi.Output()
 output.openVirtualPort('musicode')
-
-const bus = new EventEmitter()
-exec.emit = bus.emit.bind(bus)
-exec.on = bus.on.bind(bus)
 
 export default function exec({
   timeState,
@@ -44,11 +39,7 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
       output.sendMessage(message)
       debug(`ouput.sendMessage([${message}])`)
 
-      if (includesRotatable(instruction)) {
-        exec.emit('cursor', {
-          instruction,
-        })
-      }
+      instruction.rotateCursor()
     }
   }
 }
@@ -123,12 +114,6 @@ export function genericRotatableGet(
     [valueTypes.number]: () => lookupArray[value],
     [valueTypes.rotatable]: () => lookupArray[value[cursor]],
   }[type]()
-}
-
-function includesRotatable(instruction) {
-  return Object.values(instruction).some(
-    x => typeof x === 'object' && x.type === valueTypes.rotatable,
-  )
 }
 
 onExit(() => {

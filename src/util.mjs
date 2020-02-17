@@ -1,6 +1,14 @@
 import fs from 'fs'
 import { inspect } from 'util'
 
+export const createCustomErrorClass = name =>
+  class extends Error {
+    constructor(message) {
+      super(message)
+      this.name = name
+    }
+  }
+
 export function debug(data) {
   if (global.DEBUG) {
     if (!debug.initialized) {

@@ -32,6 +32,7 @@ export default class Scales {
     )
   }
 
+  // TODO: move me to parse
   parse(commaSeparated) {
     const name = commaSeparated.slice(0, commaSeparated.indexOf(' ')).trim()
     const values = commaSeparated.replace(name, '')

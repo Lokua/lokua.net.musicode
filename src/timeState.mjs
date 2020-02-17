@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import midiUtil from '@lokua/midi-util'
 
 import { partsPerQuarter } from './constants.mjs'
 import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
@@ -64,5 +65,19 @@ timeState.on('songPosition', ({ message: [, sixteenth, eighthBarCount] }) => {
   state.clock = clock - 1
   timeState.emit('clock')
 })
+
+const createHandlerEntry = event => [
+  midiUtil.statusMap.get(event),
+  data => {
+    timeState.emit(event, data)
+  },
+]
+
+timeState.clockHandlers = new Map([
+  createHandlerEntry('start'),
+  createHandlerEntry('stop'),
+  createHandlerEntry('clock'),
+  createHandlerEntry('songPosition'),
+])
 
 export default timeState

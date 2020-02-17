@@ -1,16 +1,15 @@
 import chalk from 'chalk'
 
 import parse from './parser/index.mjs'
-import { valueTypes } from './constants.mjs'
+import { subscribe } from './clock.mjs'
 import commandBus from './commandBus.mjs'
+import { valueTypes } from './constants.mjs'
+import defaultConfig from './defaultConfig.mjs'
 import exec from './exec.mjs'
-import { subscribe } from './inputClock.mjs'
-import inputClockHandlers from './inputClockHandlers.mjs'
 import Instructions from './Instructions.mjs'
+import Scales from './scales.mjs'
 import timeState from './timeState.mjs'
 import { inspectDeep } from './util.mjs'
-import Scales from './scales.mjs'
-import defaultConfig from './defaultConfig.mjs'
 
 const scales = new Scales(defaultConfig)
 const instructions = new Instructions()
@@ -87,7 +86,7 @@ timeState.on('sixteenth', () => {
 
 subscribe({
   portName: 'musicode',
-  handlers: inputClockHandlers,
+  handlers: timeState.clockHandlers,
 })
 
 function getData() {

@@ -38,4 +38,18 @@ instructionBus.on('instruction', ({ command, instruction }) => {
   }
 })
 
+const createMuteHandler = mute => ({ instructionId }) => {
+  if (instructionId.type === valueTypes.wildcard) {
+    instructions.forEach(instruction => {
+      instruction.mute = mute
+    })
+  } else if (instructionId.type === valueTypes.number) {
+    console.log('setting to', mute)
+    instructions[instructionId.value].mute = mute
+  }
+}
+
+instructionBus.on('mute', createMuteHandler(true))
+instructionBus.on('unmute', createMuteHandler(false))
+
 export default instructionBus

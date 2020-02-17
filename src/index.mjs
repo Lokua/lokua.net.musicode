@@ -27,6 +27,26 @@ commandBus
       handleParseError(error)
     }
   })
+  .on('mute', ({ command }) => {
+    try {
+      const instructionId = parse(command)
+      instructionBus.emit('mute', {
+        instructionId,
+      })
+    } catch (error) {
+      handleParseError(error)
+    }
+  })
+  .on('unmute', ({ command }) => {
+    try {
+      const instructionId = parse(command)
+      instructionBus.emit('unmute', {
+        instructionId,
+      })
+    } catch (error) {
+      handleParseError(error)
+    }
+  })
   .on('reset', timeState.resetState)
   .on('remove', ({ command }) => {
     instructionBus.emit('remove', command)

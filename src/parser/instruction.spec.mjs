@@ -75,11 +75,11 @@ function kitchenSinkExpected() {
       value: [
         {
           type: 'modulus',
-          value: 1,
+          value: 2,
         },
         {
           type: 'modulus',
-          value: 2,
+          value: 3,
         },
       ],
     },

@@ -10,7 +10,7 @@ test('canPlay:1.1.1', () => {
         meter: [0, 0, 0],
         sixteenths: 0,
       },
-      music: {
+      instruction: {
         bar: {
           type: valueTypes.number,
           value: 0,
@@ -35,7 +35,7 @@ test('canPlay:*.*.%2', () => {
         meter: [0, 0, 2],
         sixteenths: 8,
       },
-      music: {
+      instruction: {
         bar: {
           type: valueTypes.wildcard,
         },
@@ -58,7 +58,7 @@ test('canPlay:%3', () => {
         meter: [12, 0, 0],
         sixteenths: 0,
       },
-      music: {
+      instruction: {
         bar: {
           type: valueTypes.modulus,
           value: 3,
@@ -83,7 +83,7 @@ test('canPlay:*.1,3', () => {
         meter: [0, 2, 0],
         sixteenths: 0,
       },
-      music: {
+      instruction: {
         bar: {
           type: valueTypes.wildcard,
         },

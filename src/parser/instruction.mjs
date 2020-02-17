@@ -1,4 +1,8 @@
 export default function parse(string) {
+  if (!string.startsWith('e ')) {
+    throw new Error('SyntaxError')
+  }
+
   const [operator, meter, ...positionals] = splitByWhiteSpace(string)
 
   const {
@@ -77,6 +81,8 @@ function parseMetric(metric) {
       value: metric.split(',').map(parseMetric),
     }
   }
+
+  throw new Error('ParseError')
 }
 
 function parseScaleNumber(scaleNumber) {
@@ -98,6 +104,8 @@ function parseRotatable(value) {
       cursor: 0,
     }
   }
+
+  throw new Error('ParseError')
 }
 
 function commaSeperatedToArray(commaSeperated) {

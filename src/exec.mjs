@@ -31,7 +31,7 @@ export default function exec({
 
 function applyDataForInstruction({ timeState, scales, velocities }) {
   return instruction => {
-    if (canPlay({ timeState, music: instruction })) {
+    if (canPlay({ timeState, instruction })) {
       const TEMP_OFFSET = 60
       const message = [
         midiUtil.NOTE_ON,
@@ -50,14 +50,17 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
   }
 }
 
-export function canPlay({ timeState, music }) {
-  return ['bar', 'beat', 'sixteenth'].every((key, index) =>
-    canPlayMetric({
-      key,
-      timeState,
-      meterValue: timeState.meter[index],
-      instructionValue: music[key],
-    }),
+export function canPlay({ timeState, instruction }) {
+  return (
+    !instruction.mute &&
+    ['bar', 'beat', 'sixteenth'].every((key, index) =>
+      canPlayMetric({
+        key,
+        timeState,
+        meterValue: timeState.meter[index],
+        instructionValue: instruction[key],
+      }),
+    )
   )
 }
 

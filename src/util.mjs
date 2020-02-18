@@ -60,7 +60,7 @@ export function match(
         }
       }
 
-      return defaultCase()
+      return defaultCase(...args)
     }
 
     for (const [k, v] of Object.entries(cases)) {
@@ -69,8 +69,20 @@ export function match(
       }
     }
 
-    return defaultCase()
+    return defaultCase(...args)
   }
+}
+
+export function and(...fns) {
+  return (...args) => fns.every(fn => fn(...args))
+}
+
+export function or(...fns) {
+  return (...args) => fns.some(fn => fn(...args))
+}
+
+export function negate(fn) {
+  return (...args) => !fn(...args)
 }
 
 onExit.fns = []

@@ -1,3 +1,8 @@
+import { valueTypes } from '../constants.mjs'
+import { and, negate, createCustomErrorClass, match } from '../util.mjs'
+
+export const ParseError = createCustomErrorClass('ParseError')
+
 export default function parse(string) {
   if (!string.startsWith('e ')) {
     throw new Error('SyntaxError')
@@ -54,58 +59,82 @@ function parseMeter(meter) {
   return meter.split('.').map(parseMetric)
 }
 
-function parseMetric(metric) {
-  if (metric === '*') {
-    return {
-      type: 'wildcard',
-    }
-  }
-
-  if (!isNaN(Number(metric))) {
-    return {
-      type: 'number',
-      value: Number(metric) - 1,
-    }
-  }
-
-  if (!metric.includes(',') && metric.startsWith('%')) {
-    return {
-      type: 'modulus',
-      value: Number(metric.slice(1)),
-    }
-  }
-
-  if (metric.includes(',')) {
-    return {
-      type: 'list',
-      value: metric.split(',').map(parseMetric),
-    }
-  }
-
-  throw new Error('ParseError')
-}
+const parseMetric = match(
+  [
+    [
+      isWildcard,
+      () => ({
+        type: 'wildcard',
+      }),
+    ],
+    [
+      isNumeric,
+      x => ({
+        type: 'number',
+        value: Number(x) - 1,
+      }),
+    ],
+    [
+      and(negate(includesComma), startsWithPercentSign),
+      x => ({
+        type: 'modulus',
+        value: Number(x.slice(1)),
+      }),
+    ],
+    [
+      includesComma,
+      x => ({
+        type: 'list',
+        value: x.split(',').map(parseMetric),
+      }),
+    ],
+  ],
+  x => {
+    throw new ParseError(`unable to parse metric ${x}`)
+  },
+)
 
 function parseScaleNumber(scaleNumber) {
   return scaleNumber === 's' ? 0 : Number(scaleNumber.slice(1)) - 1
 }
 
-function parseRotatable(value) {
-  if (!isNaN(Number(value))) {
-    return {
-      type: 'number',
-      value: Number(value) - 1,
-    }
-  }
+const parseRotatable = match(
+  [
+    [
+      isNumeric,
+      x => ({
+        type: valueTypes.number,
+        value: Number(x) - 1,
+      }),
+    ],
+    [
+      includesComma,
+      x => ({
+        type: valueTypes.rotatable,
+        value: commaSeperatedToArray(x),
+        cursor: 0,
+      }),
+    ],
+  ],
+  () => {
+    throw new ParseError('unable to match rotatable value')
+  },
+)
 
-  if (value.includes(',')) {
-    return {
-      type: 'rotatable',
-      value: commaSeperatedToArray(value),
-      cursor: 0,
-    }
-  }
+function isWildcard(x) {
+  return x === '*'
+}
 
-  throw new Error('ParseError')
+function includesComma(x) {
+  return x.includes(',')
+}
+
+function startsWithPercentSign(x) {
+  return x.startsWith('%')
+}
+
+function isNumeric(x) {
+  return !isNaN(Number(x))
 }
 
 function commaSeperatedToArray(commaSeperated) {

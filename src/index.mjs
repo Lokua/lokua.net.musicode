@@ -64,14 +64,14 @@ commandBus
     commandBus.emit('warn', 'unregister is not implemented')
     // scales.unregister(command)
   })
-  .on('logState', () => {
+  .on('log:state', () => {
     commandBus.emit('writeLine', inspectDeep(getData()))
   })
   .on('log', () => {
     instructions.forEach((instruction, index) =>
       commandBus.emit(
         'writeLine',
-        `${chalk.green(index + 1)}: ${chalk.cyan(instruction.raw)}`,
+        `${chalk.green(index + 1)}: ${chalk.cyan(instruction.id)}`,
       ),
     )
   })

@@ -7,7 +7,6 @@ test('e *.1,3.%2,%3 s1 2 v 1,2 d 3,4', () => {
   const actual = parse(string)
   const expected = kitchenSinkExpected()
 
-  // smaller assertion cases to help minimize error output in console
   assert.deepEqual(actual.operator, expected.operator)
   assert.deepEqual(actual.bar, expected.bar)
   assert.deepEqual(actual.beat, expected.beat)

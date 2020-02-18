@@ -6,8 +6,8 @@ import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
 import { debug } from './util.mjs'
 
 const initialState = Object.freeze({
-  clock: -1,
-  sixteenths: -1,
+  clock: 0,
+  sixteenths: 0,
   meter: [0, 0, 0],
 })
 
@@ -52,8 +52,14 @@ timeState.on('clock', () => {
     timeState.emit('sixteenth', timeState.getState())
   }
 
-  if (clock % 128 === 0) {
-    debug(`clock check: ${clock}`)
+  if (global.DEBUG) {
+    if (clock % 128 === 0) {
+      debug(`clock check: ${clock}`)
+    }
+
+    if (isBarTick(clock)) {
+      console.log(`bar ${bar}`)
+    }
   }
 })
 

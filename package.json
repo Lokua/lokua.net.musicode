@@ -17,7 +17,9 @@
   "dependencies": {
     "@lokua/midi-util": "1.0.0-beta.2",
     "chalk": "3.0.0",
-    "midi": "1.0.0"
+    "midi": "1.0.0",
+    "parsimmon": "1.13.0",
+    "ramda": "0.27.0"
   },
   "devDependencies": {
     "chokidar-cli": "2.1.0",

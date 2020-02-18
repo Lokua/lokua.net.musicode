@@ -6,9 +6,9 @@ import { isBarTick, isQuarterTick, is16thTick } from './helpers.mjs'
 import { debug } from './util.mjs'
 
 const initialState = Object.freeze({
-  clock: 0,
-  sixteenths: 0,
-  meter: [0, 0, 0],
+  clock: -1,
+  sixteenths: -1,
+  meter: [-1, -1, -1],
 })
 
 const state = {
@@ -25,6 +25,12 @@ class TimeStateBus extends EventEmitter {
   resetState() {
     Object.assign(state, initialState)
   }
+
+  toString() {
+    return Object.keys(state)
+      .map(k => `${k}: ${state[k]}`)
+      .join(', ')
+  }
 }
 
 const timeState = new TimeStateBus()
@@ -33,7 +39,8 @@ timeState.on('start', timeState.resetState)
 timeState.on('stop', timeState.resetState)
 
 timeState.on('clock', () => {
-  const clock = state.clock++
+  const clock = ++state.clock
+
   let [bar, beat, sixteenth] = state.meter
 
   if (is16thTick(clock)) {
@@ -50,15 +57,9 @@ timeState.on('clock', () => {
 
     state.meter = [bar, beat, sixteenth]
     timeState.emit('sixteenth', timeState.getState())
-  }
 
-  if (global.DEBUG) {
-    if (clock % 128 === 0) {
-      debug(`clock check: ${clock}`)
-    }
-
-    if (isBarTick(clock)) {
-      console.log(`bar ${bar}`)
+    if (global.DEBUG && isBarTick(clock) && bar % 16 === 0) {
+      debug(timeState.toString())
     }
   }
 })
@@ -67,6 +68,8 @@ timeState.on('clock', () => {
 timeState.on('songPosition', ({ message: [, sixteenth, eighthBarCount] }) => {
   const clock =
     sixteenth * (partsPerQuarter / 4) + eighthBarCount * partsPerQuarter * 4
+
+  console.log(clock)
 
   state.clock = clock - 1
   timeState.emit('clock')

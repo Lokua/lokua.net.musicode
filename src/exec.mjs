@@ -2,7 +2,6 @@ import midi from 'midi'
 import midiUtil from '@lokua/midi-util'
 
 import { valueTypes } from './constants.mjs'
-import { isBarTick } from './helpers.mjs'
 import { debug, onExit } from './util.mjs'
 
 const output = new midi.Output()
@@ -28,7 +27,6 @@ export default function exec({
 function applyDataForInstruction({ timeState, scales, velocities }) {
   return instruction => {
     if (canPlay({ timeState, instruction })) {
-      console.log(timeState.meter[0])
       const TEMP_OFFSET = 60
       const message = [
         midiUtil.NOTE_ON,
@@ -39,7 +37,7 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
         }),
       ]
       output.sendMessage(message)
-      debug(`ouput.sendMessage([${message}])`)
+      // debug(`ouput.sendMessage([${message}])`)
 
       instruction.rotateCursor()
     }

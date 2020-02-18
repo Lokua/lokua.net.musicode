@@ -69,8 +69,6 @@ timeState.on('songPosition', ({ message: [, sixteenth, eighthBarCount] }) => {
   const clock =
     sixteenth * (partsPerQuarter / 4) + eighthBarCount * partsPerQuarter * 4
 
-  console.log(clock)
-
   state.clock = clock - 1
   timeState.emit('clock')
 })

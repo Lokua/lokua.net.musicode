@@ -44,6 +44,35 @@ export function safeCall(method, ...args) {
   }
 }
 
+export const MatchError = createCustomErrorClass('MatchError')
+
+export function match(
+  cases,
+  defaultCase = () => {
+    throw new MatchError()
+  },
+) {
+  return (...args) => {
+    if (Array.isArray(cases)) {
+      for (const [k, v] of cases) {
+        if (k(...args)) {
+          return typeof v === 'function' ? v(...args) : v
+        }
+      }
+
+      return defaultCase()
+    }
+
+    for (const [k, v] of Object.entries(cases)) {
+      if (k === args[0]) {
+        return typeof v === 'function' ? v(...args) : v
+      }
+    }
+
+    return defaultCase()
+  }
+}
+
 onExit.fns = []
 onExit.run = () => {
   onExit.ran = true

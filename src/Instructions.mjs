@@ -28,7 +28,7 @@ export class Instruction {
     scaleDegree,
     velocity,
     duration,
-    mute,
+    muted,
   }) {
     this.id = id
     this.operator = operator
@@ -39,7 +39,7 @@ export class Instruction {
     this.scaleDegree = scaleDegree
     this.velocity = velocity
     this.duration = duration
-    this.mute = mute
+    this.muted = muted
 
     this.validate()
   }
@@ -68,11 +68,11 @@ export class Instruction {
   }
 
   mute() {
-    this.mute = true
+    this.muted = true
   }
 
   unmute() {
-    this.mute = false
+    this.muted = false
   }
 }
 

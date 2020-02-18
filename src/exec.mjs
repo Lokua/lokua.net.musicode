@@ -65,7 +65,7 @@ function applyDataForInstruction({ timeState, scales, velocities, durations }) {
 
 export function canPlay({ timeState, instruction }) {
   return (
-    !instruction.mute &&
+    !instruction.muted &&
     ['bar', 'beat', 'sixteenth'].every((key, index) =>
       canPlayMetric({
         key,

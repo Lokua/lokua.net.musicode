@@ -7,6 +7,9 @@ import { debug, onExit } from './util.mjs'
 const output = new midi.Output()
 output.openVirtualPort('musicode')
 
+const noteOffs = new Map()
+exec.noteOffs = noteOffs
+
 export default function exec({
   timeState,
   instructions,
@@ -22,9 +25,15 @@ export default function exec({
       durations,
     }),
   )
+
+  if (noteOffs.has(timeState.sixteenths)) {
+    const message = noteOffs.get(timeState.sixteenths)
+    output.sendMessage(message)
+    debug(`ouput.sendMessage([${message}])`)
+  }
 }
 
-function applyDataForInstruction({ timeState, scales, velocities }) {
+function applyDataForInstruction({ timeState, scales, velocities, durations }) {
   return instruction => {
     if (canPlay({ timeState, instruction })) {
       const TEMP_OFFSET = 60
@@ -36,8 +45,18 @@ function applyDataForInstruction({ timeState, scales, velocities }) {
           instruction,
         }),
       ]
+
       output.sendMessage(message)
-      // debug(`ouput.sendMessage([${message}])`)
+      debug(`ouput.sendMessage([${message}])`)
+
+      noteOffs.set(
+        timeState.sixteenths +
+          genericRotatableGet('duration', {
+            lookupArray: durations,
+            instruction,
+          }),
+        [midiUtil.NOTE_OFF, message[1], 0],
+      )
 
       instruction.rotateCursor()
     }

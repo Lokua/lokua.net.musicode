@@ -87,7 +87,7 @@ function canPlayMetric({
     [valueTypes.wildcard]: () => true,
     [valueTypes.number]: () =>
       value === (key === 'bar' ? meterValue : meterValue % 4),
-    [valueTypes.modulus]: () =>
+    [valueTypes.modulo]: () =>
       key === 'bar'
         ? meterValue % value === 0
         : key === 'beat'

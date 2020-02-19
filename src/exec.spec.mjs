@@ -43,7 +43,7 @@ test('canPlay:*.*.%2', () => {
           type: valueTypes.wildcard,
         },
         sixteenth: {
-          type: valueTypes.modulus,
+          type: valueTypes.modulo,
           value: 2,
         },
       },
@@ -60,7 +60,7 @@ test('canPlay:%3', () => {
       },
       instruction: {
         bar: {
-          type: valueTypes.modulus,
+          type: valueTypes.modulo,
           value: 3,
         },
         beat: {

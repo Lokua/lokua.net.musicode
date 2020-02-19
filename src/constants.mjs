@@ -4,6 +4,10 @@ export const valueTypes = {
   wildcard: 'wildcard',
   number: 'number',
   list: 'list',
-  modulus: 'modulus',
+  get modulus() {
+    console.warn('valueTypes.modulo is deprecated. use "modulo"')
+    return 'modulo'
+  },
+  modulo: 'modulo',
   rotatable: 'rotatable',
 }

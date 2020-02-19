@@ -6,7 +6,6 @@ const rejectNils = R.reject(R.isNil)
 const objOfValue = R.objOf('value')
 const withType = R.assoc('type')
 const toNumber = R.map(Number)
-const isNumeric = R.compose(R.negate(isNaN), Number)
 
 const createLang = () =>
   P.createLanguage({

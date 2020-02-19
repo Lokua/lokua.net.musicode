@@ -8,6 +8,7 @@
     "start:debug": "npm start -- --debug",
     "start": "NODE_OPTIONS=--no-warnings node src/index.mjs",
     "test": "NODE_OPTIONS=--no-warnings node src/test/test-runner.mjs",
+    "test:dev": "chokidar \"**/*.mjs\" -c \"npm t\"",
     "lint": "node_modules/.bin/prettier",
     "peg": "pegjs -o src/grammer/grammer.js src/grammer/grammer.pegjs"
   },

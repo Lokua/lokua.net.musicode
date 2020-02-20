@@ -2,13 +2,28 @@ import { expressionTypes, valueTypes } from '../constants.mjs'
 import Lang from './Lang.mjs'
 
 export default ({ test, assert }) => {
-  // // scratch paper
-  // test('a', () => {
-  //   assert.deepEqual(Lang.a.parse('a').value, 'a')
-  //   assert.deepEqual(Lang.aList.parse('a,a,a').value, ['a', 'a', 'a'])
-  //   assert.deepEqual(Lang.aOrAList.parse('a,a,a').value, ['a', 'a', 'a'])
-  //   assert.deepEqual(Lang.aOrAList.parse('a').value, 'a')
-  // })
+  const instructionA = 'e *.1,2.%3,4'
+  const expectedInstructionResultA = {
+    expressionType: expressionTypes.instruction,
+    operator: 'e',
+    bar: {
+      type: valueTypes.wildcard,
+    },
+    beat: {
+      type: valueTypes.list,
+      value: [
+        { type: valueTypes.number, value: 0 },
+        { type: valueTypes.number, value: 1 },
+      ],
+    },
+    sixteenth: {
+      type: valueTypes.list,
+      value: [
+        { type: valueTypes.modulo, value: 3 },
+        { type: valueTypes.number, value: 3 },
+      ],
+    },
+  }
 
   test('modulo', () => {
     assert.deepEqual(Lang.modulo.parse('%2').value, {
@@ -21,9 +36,9 @@ export default ({ test, assert }) => {
     assert.deepEqual(Lang.integerList.parse('2,3,4').value, {
       type: valueTypes.list,
       value: [
+        { type: valueTypes.number, value: 1 },
         { type: valueTypes.number, value: 2 },
         { type: valueTypes.number, value: 3 },
-        { type: valueTypes.number, value: 4 },
       ],
     })
   })
@@ -33,9 +48,9 @@ export default ({ test, assert }) => {
       type: valueTypes.list,
       value: [
         { type: valueTypes.modulo, value: 2 },
-        { type: valueTypes.number, value: 3 },
+        { type: valueTypes.number, value: 2 },
         { type: valueTypes.modulo, value: 4 },
-        { type: valueTypes.number, value: 1 },
+        { type: valueTypes.number, value: 0 },
       ],
     })
     assert.ok(!Lang.integerModuloList.parse('99').status)
@@ -47,7 +62,7 @@ export default ({ test, assert }) => {
     })
     assert.deepEqual(Lang.metric.tryParse('1'), {
       type: valueTypes.number,
-      value: 1,
+      value: 0,
     })
     assert.deepEqual(Lang.metric.tryParse('%2'), {
       type: valueTypes.modulo,
@@ -58,11 +73,11 @@ export default ({ test, assert }) => {
       value: [
         {
           type: valueTypes.number,
-          value: 1,
+          value: 0,
         },
         {
           type: valueTypes.number,
-          value: 2,
+          value: 1,
         },
       ],
     })
@@ -70,12 +85,12 @@ export default ({ test, assert }) => {
 
   test('meter', () => {
     assert.deepEqual(Lang.meter.parse('1.1.1').value, {
-      bar: { type: valueTypes.number, value: 1 },
-      beat: { type: valueTypes.number, value: 1 },
-      sixteenth: { type: valueTypes.number, value: 1 },
+      bar: { type: valueTypes.number, value: 0 },
+      beat: { type: valueTypes.number, value: 0 },
+      sixteenth: { type: valueTypes.number, value: 0 },
     })
     assert.deepEqual(Lang.meter.parse('1.*.%2').value, {
-      bar: { type: valueTypes.number, value: 1 },
+      bar: { type: valueTypes.number, value: 0 },
       beat: { type: valueTypes.wildcard },
       sixteenth: { type: valueTypes.modulo, value: 2 },
     })
@@ -84,63 +99,47 @@ export default ({ test, assert }) => {
       beat: {
         type: valueTypes.list,
         value: [
+          { type: valueTypes.number, value: 0 },
           { type: valueTypes.number, value: 1 },
-          { type: valueTypes.number, value: 2 },
         ],
       },
       sixteenth: {
         type: valueTypes.list,
         value: [
           { type: valueTypes.modulo, value: 3 },
-          { type: valueTypes.number, value: 4 },
+          { type: valueTypes.number, value: 3 },
         ],
       },
     })
   })
 
   test('instructionExpression', () => {
-    assert.deepEqual(Lang.instructionExpression.parse('e *.1,2.%3,2').value, {
-      operator: 'e',
-      bar: {
-        type: valueTypes.wildcard,
-      },
-      beat: {
-        type: valueTypes.list,
-        value: [
-          { type: valueTypes.number, value: 1 },
-          { type: valueTypes.number, value: 2 },
-        ],
-      },
-      sixteenth: {
-        type: valueTypes.list,
-        value: [
-          { type: valueTypes.modulo, value: 3 },
-          { type: valueTypes.number, value: 2 },
-        ],
-      },
-    })
+    assert.deepEqual(
+      Lang.instructionExpression.parse(instructionA).value,
+      expectedInstructionResultA,
+    )
   })
 
   test('scale', () => {
     assert.deepEqual(Lang.scale.parse('s 1').value, {
-      scaleNumber: 1,
+      scaleNumber: 0,
       scaleDegree: {
         type: valueTypes.number,
-        value: 1,
+        value: 0,
       },
     })
     assert.deepEqual(Lang.scale.parse('s4 1,2').value, {
-      scaleNumber: 4,
+      scaleNumber: 3,
       scaleDegree: {
         type: 'list',
         value: [
           {
             type: valueTypes.number,
-            value: 1,
+            value: 0,
           },
           {
             type: valueTypes.number,
-            value: 2,
+            value: 1,
           },
         ],
       },
@@ -151,6 +150,7 @@ export default ({ test, assert }) => {
     assert.deepEqual(
       Lang.instructionExpression.parse('e *.1,2.%3,2 s 1').value,
       {
+        expressionType: expressionTypes.instruction,
         operator: 'e',
         bar: {
           type: valueTypes.wildcard,
@@ -158,21 +158,21 @@ export default ({ test, assert }) => {
         beat: {
           type: valueTypes.list,
           value: [
+            { type: valueTypes.number, value: 0 },
             { type: valueTypes.number, value: 1 },
-            { type: valueTypes.number, value: 2 },
           ],
         },
         sixteenth: {
           type: valueTypes.list,
           value: [
             { type: valueTypes.modulo, value: 3 },
-            { type: valueTypes.number, value: 2 },
+            { type: valueTypes.number, value: 1 },
           ],
         },
-        scaleNumber: 1,
+        scaleNumber: 0,
         scaleDegree: {
           type: valueTypes.number,
-          value: 1,
+          value: 0,
         },
       },
     )
@@ -182,15 +182,15 @@ export default ({ test, assert }) => {
     assert.deepEqual(Lang.rotatable.parse('v 1').value, {
       velocity: {
         type: valueTypes.number,
-        value: 1,
+        value: 0,
       },
     })
     assert.deepEqual(Lang.rotatable.parse('v 1,2').value, {
       velocity: {
         type: valueTypes.list,
         value: [
+          { type: valueTypes.number, value: 0 },
           { type: valueTypes.number, value: 1 },
-          { type: valueTypes.number, value: 2 },
         ],
       },
     })
@@ -198,31 +198,31 @@ export default ({ test, assert }) => {
 
   test('instructionExpression: with rotatables', () => {
     const actual = Lang.instructionExpression.parse('e 1.1.1 s 1 v 1').value
-    assert.deepEqual(actual.velocity, { type: valueTypes.number, value: 1 })
+    assert.deepEqual(actual.velocity, { type: valueTypes.number, value: 0 })
   })
 
   test('instructionExpression: with 2 rotatables', () => {
     const actual = Lang.instructionExpression.parse('e 1.1.1 s 1 v 1 d 2').value
-    assert.deepEqual(actual.duration, { type: valueTypes.number, value: 2 })
+    assert.deepEqual(actual.duration, { type: valueTypes.number, value: 1 })
   })
 
   test('instructionExpression: any order', () => {
     assert.deepEqual(
       Lang.instructionExpression.parse('e 1.1.1 s 1 v 1 d 2').value.duration,
-      { type: valueTypes.number, value: 2 },
+      { type: valueTypes.number, value: 1 },
     )
     assert.deepEqual(
       Lang.instructionExpression.parse('e 1.1.1 v 1 s 1 d 2').value.duration,
-      { type: valueTypes.number, value: 2 },
+      { type: valueTypes.number, value: 1 },
     )
     assert.deepEqual(
       Lang.instructionExpression.parse('e 1.1.1 d 2 v 1 s 1').value.duration,
-      { type: valueTypes.number, value: 2 },
+      { type: valueTypes.number, value: 1 },
     )
     // -- no scale
     assert.deepEqual(
       Lang.instructionExpression.parse('e 1.1.1 d 2').value.duration,
-      { type: valueTypes.number, value: 2 },
+      { type: valueTypes.number, value: 1 },
     )
   })
 
@@ -232,7 +232,7 @@ export default ({ test, assert }) => {
       {
         expressionType: expressionTypes.register,
         name: 'foo',
-        value: [1, 2, 3],
+        value: [0, 1, 2],
       },
     )
   })
@@ -271,7 +271,7 @@ export default ({ test, assert }) => {
       expressionType: expressionTypes.mute,
       value: {
         type: valueTypes.number,
-        value: 1,
+        value: 0,
       },
     })
   })
@@ -282,11 +282,30 @@ export default ({ test, assert }) => {
       value: {
         type: valueTypes.list,
         value: [
+          { type: valueTypes.number, value: 0 },
           { type: valueTypes.number, value: 1 },
           { type: valueTypes.number, value: 2 },
-          { type: valueTypes.number, value: 3 },
         ],
       },
     })
+  })
+
+  test('expression', () => {
+    assert.deepEqual(Lang.expression.parse('register foo 1,2,3').value, {
+      expressionType: expressionTypes.register,
+      name: 'foo',
+      value: [0, 1, 2],
+    })
+    assert.deepEqual(Lang.expression.parse('mute 1').value, {
+      expressionType: expressionTypes.mute,
+      value: {
+        type: valueTypes.number,
+        value: 0,
+      },
+    })
+    assert.deepEqual(
+      Lang.expression.parse(instructionA).value,
+      expectedInstructionResultA,
+    )
   })
 }

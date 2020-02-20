@@ -1,6 +1,5 @@
 import P from 'parsimmon'
 import R from 'ramda'
-import chalk from 'chalk'
 import { expressionTypes, valueTypes } from '../constants.mjs'
 
 const rotatableNames = {
@@ -8,10 +7,8 @@ const rotatableNames = {
   d: 'duration',
 }
 
-const rejectNils = R.reject(R.isNil)
 const objOfValue = R.objOf('value')
 const assocType = R.assoc('type')
-const trace = message => R.tap(x => console.log(chalk.bold.magenta(message), x))
 const asValueType = t => R.compose(assocType(t), objOfValue)
 const asListValueType = asValueType(valueTypes.list)
 const rejectEmptyStrings = R.reject(R.both(R.is(String), R.isEmpty))
@@ -22,18 +19,13 @@ const ensureMultiple = parser =>
   )
 
 export default P.createLanguage({
-  // scratch paper
-  // aOrAList: r => P.alt(ensureMultiple(r.aList), r.a),
-  // aList: r => r.a.sepBy1(P.string(',')),
-  // a: () => P.string('a'),
-
   expression: r =>
     P.alt(
       r.instructionExpression,
       r.muteExpression,
       r.registerExpression,
       r.unregisterExpression,
-    ).map(rejectNils),
+    ),
 
   instructionExpression: r => {
     const required = [r.instruction.skip(r._), r.meter]
@@ -46,7 +38,13 @@ export default P.createLanguage({
       P.seq(...required, r._, r.scale, r._, r.rotatable),
       P.seq(...required, r._, P.alt(r.scale, r.rotatable)),
       P.seq(...required),
-    ).map(R.compose(R.mergeAll, rejectEmptyStrings))
+    ).map(
+      R.compose(
+        R.assoc('expressionType', expressionTypes.instruction),
+        R.mergeAll,
+        rejectEmptyStrings,
+      ),
+    )
   },
   instruction: () => P.string('e').map(R.objOf('operator')),
   meter: r =>
@@ -55,25 +53,26 @@ export default P.createLanguage({
       beat,
       sixteenth,
     })),
-  metric: r => P.alt(r.integerModuloList, r.modulo, r.wildcard, r.number),
+  metric: r =>
+    P.alt(r.integerModuloList, r.modulo, r.wildcard, r.nonZeroIndexedNumber),
   scale: r =>
     P.seqMap(
       r.scaleNumber.skip(r._),
-      P.alt(r.integerList, r.number),
+      P.alt(r.integerList, r.nonZeroIndexedNumber),
       (scaleNumber, scaleDegree) => ({
         scaleNumber,
         scaleDegree,
       }),
     ),
   scaleNumber: r =>
-    P.alt(ensureMultiple(P.seq(r.s, r.digits)), r.s).map(x =>
-      Number(Array.isArray(x) ? x[1] : 1),
+    P.alt(ensureMultiple(P.seq(r.s, r.nonZeroIndexedNumber)), r.s).map(x =>
+      Number(Array.isArray(x) ? x[1].value : 0),
     ),
   s: () => P.string('s'),
   rotatable: r =>
     P.seqMap(
       P.regex(/[vd]/).skip(r._),
-      P.alt(r.integerList, r.number),
+      P.alt(r.integerList, r.nonZeroIndexedNumber),
       (k, v) => ({
         [rotatableNames[k]]: v,
       }),
@@ -82,7 +81,7 @@ export default P.createLanguage({
   muteExpression: r =>
     P.seqMap(
       P.regex(/(un)?mute/).skip(r._),
-      P.alt(r.wildcard, r.integerList, r.number),
+      P.alt(r.wildcard, r.integerList, r.nonZeroIndexedNumber),
       (expressionType, value) => ({
         expressionType,
         value,
@@ -110,13 +109,14 @@ export default P.createLanguage({
       }),
     ),
 
+  // TODO: or is this transpose?
   transform: () => P.string('t'),
 
   // composite atoms
   integerList: r =>
-    ensureMultiple(r.number.sepBy1(r.comma)).map(asListValueType),
+    ensureMultiple(r.nonZeroIndexedNumber.sepBy1(r.comma)).map(asListValueType),
   integerModuloList: r =>
-    ensureMultiple(P.alt(r.modulo, r.number).sepBy1(r.comma)).map(
+    ensureMultiple(P.alt(r.modulo, r.nonZeroIndexedNumber).sepBy1(r.comma)).map(
       asListValueType,
     ),
 
@@ -125,6 +125,13 @@ export default P.createLanguage({
     r.percentSign
       .then(r.digits)
       .map(R.compose(asValueType(valueTypes.modulo), Number)),
+  nonZeroIndexedNumber: r =>
+    // for meter, scale degree, and ID association the program uses human friendly numbers,
+    // the theory is that it will be easier dealing with that here than throughout the program
+    r.number.map(x => ({
+      ...x,
+      value: x.value - 1,
+    })),
   number: r => r.digits.map(R.compose(asValueType(valueTypes.number), Number)),
   string: () => P.letters.map(asValueType(valueTypes.string)),
   wildcard: () => P.string('*').map(R.always({ type: valueTypes.wildcard })),

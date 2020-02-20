@@ -55,7 +55,7 @@ function prettyPrintAssertError(filename, testName, error) {
   console.error(
     chalk.cyan(filename),
     '\n',
-    chalk.red(`\n${testName} failed\n`),
+    chalk.bold.underline.red(`\n${testName} failed\n`),
     error.message.trimEnd(),
     '\n\n',
     chalk.gray(

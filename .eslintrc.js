@@ -10,7 +10,7 @@ module.exports = {
   rules: {
     'no-unused-vars': [
       1,
-      { varsIgnorePattern: /debug|trace/, ignoreRestSiblings: true },
+      { varsIgnorePattern: 'debug|trace', ignoreRestSiblings: true },
     ],
     'no-sparse-arrays': 0,
   },

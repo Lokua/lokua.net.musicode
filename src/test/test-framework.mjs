@@ -1,9 +1,22 @@
-import { inspect } from 'util'
+const f = []
 
-export default function test(name, fn) {
+test.f = name => {
+  f.push(name)
+}
+
+test.x = () => {
+  //
+}
+
+export default async function test(testName, fn) {
   try {
-    fn()
+    if (!f.length || f.includes(testName)) {
+      await fn()
+    }
   } catch (error) {
-    console.error(name, inspect(error, false, null, true))
+    test.failure = {
+      testName,
+      error,
+    }
   }
 }
